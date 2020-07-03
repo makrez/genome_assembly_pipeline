@@ -14,7 +14,7 @@ environment.
 
 `conda deactivate`
 
-The script `run_sbatch.sh` will take care of running the pipeline. Inside the
+2. The script `run_sbatch.sh` will take care of running the pipeline. Inside the
 script, the `snakemake` command is listed two times: The first line is outcommented
 by default and runs the pipeline. The second line executes a dry run. You have
 to outcomment the first `snakemake` command to actually run the pipeline.
@@ -45,7 +45,7 @@ This snakemake pipeline performs the following tasks:
 
  Inteded use: single strain samples from Dialact (Agroscope)
 
-![Graphical representation of the pipeline.](scripts/dag.png)
+![Graphical representation of the pipeline.](workflow/scripts/dag.png)
 
 
 ## Files
