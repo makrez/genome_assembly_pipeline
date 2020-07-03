@@ -1,0 +1,36 @@
+import os, string, re, shutil
+import glob
+from pathlib import Path
+
+configfile: "config/config.json"
+
+### Config Variables
+### ----------------------------------------------------------------------------
+
+DataFolder = config['DataFolder']
+fastx_extension = config["extension"]
+
+# Samples
+files = os.listdir(DataFolder)
+complete_extension = config['complete_extension']
+samples = set([re.sub(complete_extension, "", file) for file in files])
+
+mates = list(config['mates'].values())
+
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+
+## Pipeline with pooling of reads
+#------------------------------------------------------------------------------
+
+rule all:
+    input: "results/5_report/pipeline_finished.txt"
+
+include: "rules/QC.smk"
+include: "rules/spades.smk"
+include: "rules/quast.smk"
+include: "rules/busco.smk"
+include: "rules/confindr.smk"
+include: "rules/prokka.smk"
+include: "rules/finish.smk"
