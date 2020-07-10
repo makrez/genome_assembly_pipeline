@@ -21,7 +21,7 @@ rule spades:
   shell:
     " set +u ;"
     " source {params.conda_profile} ;"
-    " conda activate spades ;"
+    " conda activate spades_3.14.0 ;"
     " srun spades.py "
     "  --isolate "
 	  "  --cov-cutoff 'auto' "

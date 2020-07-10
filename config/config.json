@@ -20,10 +20,9 @@
     "fastqc_mem_mb": 32000,
   },
   "spades" : {
-    "spades_version": "3.14.0",
     "spades_hours": 72,
-    "spades_mem_mb": 250000,
-    "spades_mem_gb":250,
+    "spades_mem_mb": 20000,
+    "spades_mem_gb":20,
     "spades_threads": 64,
     "spades_min_scaffold_length": 200
   },

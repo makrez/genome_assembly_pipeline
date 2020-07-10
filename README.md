@@ -70,7 +70,7 @@ the file "results/5_report/conda_software_versions.txt"
 
 * short_sh_commands_hours: Number of hours used for short bash commands.
 
-*make sure to allocate enough memory to SPADes (>250GB) and GTDB-TK (>250GB)*
+*make sure to allocate enough memory to SPADes (>250GB) and GTDB-TK (>20GB)* 
 
 
 **Data specifications**
