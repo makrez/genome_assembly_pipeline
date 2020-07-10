@@ -8,7 +8,7 @@ rule spades:
     "results/1_spades_assembly/{sample}/contigs.fasta"
 
   params:
-    spades=config["spades"]["spades_version"]
+    conda_profile = "/mnt/apps/centos7/Conda/miniconda3/etc/profile.d/conda.sh",
 
   threads:
     int(config['spades']['spades_threads'])
@@ -19,8 +19,9 @@ rule spades:
     mem_gb = int(config['spades']['spades_mem_gb'])
 
   shell:
-    " module add vital-it/7 ;"
-    " module add UHTS/Assembler/SPAdes/{params.spades} ;"
+    " set +u ;"
+    " source {params.conda_profile} ;"
+    " conda activate spades ;"
     " srun spades.py "
     "  --isolate "
 	  "  --cov-cutoff 'auto' "

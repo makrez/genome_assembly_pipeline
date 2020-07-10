@@ -1,5 +1,5 @@
 {
-  "DataFolder" : "../data/03_Bern/",
+  "DataFolder" : "data_testing/",
   "DataFolder_testing": "/data/datasets/E_coli_testdata/raw/p10/",
   "extension" : ".fastq.gz",
   "complete_extension": "_.\\.fastq\\.gz",
