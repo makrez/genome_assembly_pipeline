@@ -1,13 +1,13 @@
 rule prokka:
   input:
-    CONTIGS = "results/1_spades_assembly/{sample}/contigs_200.fasta"
+    CONTIGS = "results/{sample}/1_spades_assembly/contigs_200.fasta"
 
   output:
-    TXT = "results/4_prokka/{sample}/{sample}.txt",
-    GENOME = "results/4_prokka/{sample}/{sample}.fna"
+    TXT = "results/{sample}/4_prokka/{sample}.txt",
+    GENOME = "results/{sample}/4_prokka/{sample}.fna"
 
   log:
-    "results/4_prokka/{sample}/prokka/prokka.log"
+    "results/logs/{sample}/prokka.log"
 
   params:
     conda_profile = "/mnt/apps/centos7/Conda/miniconda3/etc/profile.d/conda.sh",
@@ -28,17 +28,17 @@ rule prokka:
     " srun prokka "
     "  --force "
     "  --cpus {threads} "
-    "  --outdir results/4_prokka/{wildcards.sample}/ "
-    "  --prefix {wildcards.sample} {input.CONTIGS} ;"
+    "  --outdir results/{wildcards.sample}/4_prokka/ "
+    "  --prefix {wildcards.sample} {input.CONTIGS} 2> {log} ;"
 
 #-------------------------------------------------------------------------------
 
 rule convert_prokka_summary:
   input:
-    TSV = "results/4_prokka/{sample}/{sample}.txt"
+    TSV = "results/{sample}/4_prokka/{sample}.txt"
 
   output:
-    CSV = "results/4_prokka/{sample}/{sample}.csv"
+    CSV = "results/{sample}/4_prokka/{sample}.csv"
 
   threads:
     int(config['short_sh_commands_threads'])
@@ -52,13 +52,13 @@ rule convert_prokka_summary:
     " srun /bin/sed 's/ *$//g' < {input.TSV} | "
     "  /bin/sed 's/ /_/g' | /bin/sed 's/:_/ /g' | "
     "  /bin/awk -v var={wildcards.sample} '{{print $1\",\"$2\",\"var}}' "
-    "  > {output.CSV}"
+    "  > {output.CSV} ;"
 
 #-------------------------------------------------------------------------------
 
 rule concatenate_prokka:
   input:
-    CSV = expand("results/4_prokka/{sample}/{sample}.csv", sample = samples)
+    CSV = expand("results/{sample}/4_prokka/{sample}.csv", sample = samples)
 
   output:
     "results/5_report/prokka_summary.csv"
@@ -77,11 +77,11 @@ rule concatenate_prokka:
 
 rule move_genomes:
   input:
-    TXT =  "results/4_prokka/{sample}/{sample}.txt",
-    GENOME = "results/4_prokka/{sample}/{sample}.fna"
+    TXT =  "results/{sample}/4_prokka/{sample}.txt",
+    GENOME = "results/{sample}/4_prokka/{sample}.fna"
 
   output:
-    LINK = "results/4_prokka/genomes/{sample}.fna"
+    LINK = "results/genomes/{sample}.fna"
 
   threads:
     int(config['short_sh_commands_threads'])
@@ -91,18 +91,20 @@ rule move_genomes:
     hours = int(config['short_sh_commands_hours'])
 
   run:
-    dest_dir = "results/4_prokka/genomes/"
+    dest_dir = "results/genomes/"
     shutil.copy(f'{input.GENOME}', dest_dir)
 
 #-------------------------------------------------------------------------------
 
 rule gtdb:
   input:
-    GENOME = expand("results/4_prokka/genomes/{sample}.fna", sample=samples)
+    GENOME = expand("results/genomes/{sample}.fna", sample=samples)
 
   output:
-    LINK = "results/4_prokka/genomes/gtdb_link.txt",
-    DIR = directory("results/4_prokka/taxonomy")
+    LINK = "results/genomes/gtdb_link.txt",
+    DIR = directory("results/taxonomy")
+
+  log: "results/logs/{sample}/gtdbk.log
 
   params:
     conda_profile = "/mnt/apps/centos7/Conda/miniconda3/etc/profile.d/conda.sh",
@@ -120,11 +122,11 @@ rule gtdb:
     " source {params.conda_profile} ;"
     " conda activate gtdbtk ;"
     " gtdbtk --version >> {params.version} ;"
-    " srun mkdir -p results/4_prokka/taxonomy ;"
+    " /bin/mkdir -p results/taxonomy ;"
     " srun gtdbtk classify_wf "
-    "  --genome_dir results/4_prokka/genomes/ "
-    "  --out_dir results/4_prokka/taxonomy "
-    "  --cpus {threads} ;"
-    " srun /bin/touch {output.LINK} ;"
+    "  --genome_dir results/genomes/ "
+    "  --out_dir results/taxonomy "
+    "  --cpus {threads} 2> {log} ;"
+    " /bin/touch {output.LINK} ;"
 
 #-------------------------------------------------------------------------------

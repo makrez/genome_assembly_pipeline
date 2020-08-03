@@ -6,10 +6,11 @@ rule finish_pipeline:
     confindr = "results/5_report/confindr_summary.csv",
     gtdb = "results/4_prokka/genomes/gtdb_link.txt",
     coverage="results/5_report/contig_coverage.txt",
-    prokka = "results/5_report/prokka_summary.csv"
+    prokka = "results/5_report/prokka_summary.csv",
+#    HTML = expand("results/5_report/{sample}_report.html", sample = samples)
 
   output:
-    "results/5_report/pipeline_finished.txt"
+    "results/logs/pipeline_finished.txt"
 
   threads:
     int(config['short_sh_commands_threads'])

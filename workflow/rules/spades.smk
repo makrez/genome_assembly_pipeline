@@ -1,11 +1,13 @@
 rule spades:
   input:
-    FORWARD = "results/0_trim/{sample}/{sample}" + "_1" + f"{fastx_extension}",
-    REVERSE = "results/0_trim/{sample}/{sample}" + "_2" + f"{fastx_extension}",
-    LINK = "results/0_trim/{sample}/result_fastqc/{sample}" + config['mates']['mate1'] + "_fastqc.zip",
+    FORWARD = "results/{sample}/0_trim/{sample}" + "_1" + f"{fastx_extension}",
+    REVERSE = "results/{sample}/0_trim/{sample}" + "_2" + f"{fastx_extension}",
+    LINK = "results/{sample}/0_trim/result_fastqc/{sample}" + config['mates']['mate1'] + "_fastqc.zip",
 
   output:
-    "results/1_spades_assembly/{sample}/contigs.fasta"
+    "results/{sample}/1_spades_assembly/contigs.fasta"
+
+  log: "results/logs/{sample}/spades.log"
 
   params:
     conda_profile = "/mnt/apps/centos7/Conda/miniconda3/etc/profile.d/conda.sh",
@@ -21,7 +23,7 @@ rule spades:
   shell:
     " set +u ;"
     " source {params.conda_profile} ;"
-    " conda activate spades_3.14.0 ;"
+    " conda activate spades_3.14.0 ;" //# TODO: software versions
     " srun spades.py "
     "  --isolate "
 	  "  --cov-cutoff 'auto' "
@@ -30,15 +32,15 @@ rule spades:
     "  -m {resources.mem_gb} "
     "  -1 {input.FORWARD} "
     "  -2 {input.REVERSE} "
-    "  -o results/1_spades_assembly/{wildcards.sample} ;"
+    "  -o results/1_spades_assembly/{wildcards.sample} 2> {log} ;"
 
 #-------------------------------------------------------------------------------
 rule cleanup:
   input:
-    "results/1_spades_assembly/{sample}/contigs.fasta"
+    "results/{sample}/1_spades_assembly/contigs.fasta"
 
   output:
-    "results/1_spades_assembly/{sample}/contigs_200.fasta"
+    "results/{sample}/1_spades_assembly/contigs_200.fasta"
 
   params:
     scaffolds_filter = int(config['spades']['spades_min_scaffold_length'])
@@ -59,7 +61,7 @@ rule cleanup:
 #-------------------------------------------------------------------------------
 rule parse_coverage:
   input:
-    CONTIGS = expand("results/1_spades_assembly/{sample}/contigs_200.fasta", sample = samples)
+    CONTIGS = expand("results/{sample}/1_spades_assembly/contigs_200.fasta", sample = samples)
 
   output:
     COVSTATS = "results/5_report/contig_coverage.txt"

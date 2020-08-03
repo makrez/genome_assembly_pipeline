@@ -1,12 +1,12 @@
 rule busco:
   input:
-    SCAFFOLDS = "results/1_spades_assembly/{sample}/contigs_200.fasta"
+    SCAFFOLDS = "results/{sample}/1_spades_assembly/contigs_200.fasta"
 
   output:
-    LINK = "results/2_busco/{sample}/busco/link.txt"
+    LINK = "results/{sample}/2_busco/busco/link.txt"
 
   log:
-    "results/2_busco/{sample}/busco/busco.log"
+    "results/logs/{sample}/busco/busco.log"
 
   params:
     conda_profile = "/mnt/apps/centos7/Conda/miniconda3/etc/profile.d/conda.sh",
@@ -37,7 +37,7 @@ rule busco:
 
 rule move_busco_files:
   input:
-    LINK =  "results/2_busco/{sample}/busco/link.txt"
+    LINK =  "results/{sample}/2_busco/busco/link.txt"
 
   output:
     LINK = "results/5_report/busco_summary/{sample}_buscolink.log"
@@ -67,6 +67,8 @@ rule make_busco_plots:
   output:
     FIGURE = "results/5_report/busco_summary/busco_figure.png"
 
+  log = "results/logs/busco_plot.log"
+
   threads:
     int(config['short_sh_commands_threads'])
 
@@ -82,4 +84,4 @@ rule make_busco_plots:
     " source {params.conda_profile} ;"
     " conda activate busco4 ;"
     " srun python workflow/scripts/scripts_generate_plot.py "
-    "  -wd results/5_report/busco_summary ;"
+    "  -wd results/5_report/busco_summary 2> {log} ;"

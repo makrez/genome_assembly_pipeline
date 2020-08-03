@@ -14,6 +14,8 @@ fastx_extension = config["extension"]
 files = os.listdir(DataFolder)
 complete_extension = config['complete_extension']
 samples = set([re.sub(complete_extension, "", file) for file in files])
+# Only for testing
+#samples = ['CK01']
 
 mates = list(config['mates'].values())
 
@@ -25,7 +27,10 @@ mates = list(config['mates'].values())
 #------------------------------------------------------------------------------
 
 rule all:
-    input: "results/5_report/pipeline_finished.txt"
+    input: #"results/5_report/pipeline_finished.txt"
+ #     expand("results/5_report/{sample}_report.html", sample =samples),
+      "results/5_report/pipeline_finished.txt"
+
 
 include: "rules/QC.smk"
 include: "rules/spades.smk"
@@ -34,3 +39,4 @@ include: "rules/busco.smk"
 include: "rules/confindr.smk"
 include: "rules/prokka.smk"
 include: "rules/finish.smk"
+#include: "rules/generate_report_individual.smk"

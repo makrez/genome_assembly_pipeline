@@ -79,24 +79,6 @@ software <- readLines("../../results/5_report/software.txt")
 ```
 \tableofcontents
 
-# Summary
-
-The sequence reads produced in this experiment are of good quality, but with high levels of duplication (see Table \ref{tab:fastqc}). The genome assembly was performed with SPAdes (version 3.14.0) and the quality of the
-assembly was assessed with Quast, Confindr and Busco4. Quast provides quantitative metrics of the assemlby, such as the N50 or the L75 metrics (Table \ref{tab:quast}). The results from confindr indicate
-that samples **LMX9**, **LMR1**, **LAR21** and **F12** are potentially contaminated (see Table \ref{tab:confindr}). In order to assess whether core genes are assembled correctly, the tool
-BUSCO4 was applied. Overall, the assemblies show very low fractions of missing, fragmented or duplicated genes. However, samples **F12**, **LBA3** and **LMX9** show a high numbers of duplicated genes (see Figure \ref{fig:busco}). This could either be due to contamination or actual gene/genome duplication events. Given that
-confindr found **LMX9** and **F12** to be contaminated, these results point towards
-a technical issue rather than being biologically meaningful.
-
-The annotation was performed with Prokka (see Table \ref{tab:prokka}). The taxonomic assignment of the genomes was calculated with GTDB-TK. Samples **LBA3**, **F12** and **LMX9** were assigned to the domain Archaea (see Table \ref{tab:taxonomy}).
-
-## To do
-
-* Meta-assembly of  **LBA3**, **F12** and **LMX9** in order to try to separate contamination from contigs.
-
-* Adding meta-data
-
-
 # Read Quality
 
 ## FastQC

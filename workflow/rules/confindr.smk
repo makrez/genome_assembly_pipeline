@@ -1,10 +1,12 @@
 rule confindr:
   input:
-    LINK = "results/1_spades_assembly/{sample}/contigs_200.fasta",
+    LINK = "results/{sample}/1_spades_assembly/contigs_200.fasta",
+
   output:
-    CSV = "results/3_confindr/{sample}/confindr_report.csv"
+    CSV = "results/{sample}/3_confindr/confindr_report.csv"
+
   log:
-    "results/3_confindr/{sample}/confindr/confindr.log"
+    "results/logs/{sample}/confindr.log"
 
   params:
     conda_profile = "/mnt/apps/centos7/Conda/miniconda3/etc/profile.d/conda.sh",
@@ -27,13 +29,14 @@ rule confindr:
     "  -o results/3_confindr/{wildcards.sample} "
     "  -d /data/projects/p446_Dialact_Phoenix/7_sw_and_dbs/confindr_dbs "
     "  -t {threads} "
-    "  --cross_details ;"
+    "  --cross_details 2> {log};"
 
 #-------------------------------------------------------------------------------
 
 rule confindr_summary:
   input:
-    TXT = expand("results/3_confindr/{sample}/confindr_report.csv", sample = samples)
+    TXT = expand("results/{sample}/3_confindr/confindr_report.csv", \
+                 sample = samples)
 
   output:
     CSV = "results/5_report/confindr_summary.csv"

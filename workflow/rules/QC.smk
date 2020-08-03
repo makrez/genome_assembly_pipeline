@@ -4,12 +4,12 @@ rule fastp:
     REVERSE = f"{DataFolder}" + "{sample}" + config['mates']['mate2'] + f"{fastx_extension}"
 
   output:
-    FORWARD = "results/0_trim/{sample}/{sample}" + "_1" + f"{fastx_extension}",
-    REVERSE = "results/0_trim/{sample}/{sample}" + "_2" + f"{fastx_extension}",
-    JSON = "results/0_trim/{sample}/{sample}.json",
-    HTML = "results/0_trim/{sample}/{sample}.html"
+    FORWARD = "results/{sample}/0_trim/{sample}" + "_1" + f"{fastx_extension}",
+    REVERSE = "results/{sample}/0_trim/{sample}" + "_2" + f"{fastx_extension}",
+    JSON = "results/{sample}/0_trim/{sample}.json",
+    HTML = "results/{sample}/0_trim/{sample}.html"
 
-  log: "results/0_trim/{sample}/fastp.log"
+  log: "results/logs/{sample}/fastp.log"
 
   params:
     fastp=config['fastp']['fastp_version']
@@ -36,16 +36,16 @@ rule fastp:
 
 rule fastqc_run:
   input:
-    R1= "results/0_trim/{sample}/{sample}" + config['mates']['mate1'] + f"{fastx_extension}",
-    R2= "results/0_trim/{sample}/{sample}" + config['mates']['mate2'] + f"{fastx_extension}"
+    R1= "results/{sample}/0_trim/{sample}" + config['mates']['mate1'] + f"{fastx_extension}",
+    R2= "results/{sample}/0_trim/{sample}" + config['mates']['mate2'] + f"{fastx_extension}"
 
   output:
-    ZIP_1 = "results/0_trim/{sample}/result_fastqc/{sample}" + config['mates']['mate1'] + "_fastqc.zip",
-    ZIP_2 = "results/0_trim/{sample}/result_fastqc/{sample}" + config['mates']['mate2'] + "_fastqc.zip"
+    ZIP_1 = "results/{sample}/0_trim/result_fastqc/{sample}" + config['mates']['mate1'] + "_fastqc.zip",
+    ZIP_2 = "results/{sample}/0_trim/result_fastqc/{sample}" + config['mates']['mate2'] + "_fastqc.zip"
 
   log:
-    LOG_1 = "results/0_trim/{sample}/result_fastqc/fastqc_forward.log",
-    LOG_2 = "results/0_trim/{sample}/result_fastqc/fastqc_reverse.log"
+    LOG_1 = "results/logs/{sample}/fastqc_forward.log",
+    LOG_2 = "results/logs/{sample}/fastqc_reverse.log"
 
   params:
     fastqc=config['fastqc']['fastqc_version']
@@ -60,19 +60,20 @@ rule fastqc_run:
   shell:
     " module add UHTS/Quality_control/fastqc/{params.fastqc} ;"
     " srun fastqc {input.R1} -t {threads} "
-    "  -o results/0_trim/{wildcards.sample}/result_fastqc/ 2> {log.LOG_1} ;"
+    "  -o results/{wildcards.sample}/0_trim/result_fastqc/ 2> {log.LOG_1} ;"
     " srun fastqc {input.R2} -t {threads} "
-    "  -o results/0_trim/{wildcards.sample}/result_fastqc/ 2> {log.LOG_2} ;"
+    "  -o results/{wildcards.sample}/0_trim/result_fastqc/ 2> {log.LOG_2} ;"
 
 #-------------------------------------------------------------------------------
 rule parse_fastqc_output:
   input:
-    fastqc_F= "results/0_trim/{sample}/result_fastqc/{sample}" + config['mates']['mate1'] + "_fastqc.zip",
-    fastqc_R= "results/0_trim/{sample}/result_fastqc/{sample}" + config['mates']['mate2'] + "_fastqc.zip"
+    fastqc_F= "results/{sample}/0_trim/result_fastqc/{sample}" + config['mates']['mate1'] + "_fastqc.zip",
+    fastqc_R= "results/{sample}/0_trim/result_fastqc/{sample}" + config['mates']['mate2'] + "_fastqc.zip"
 
   output:
-    FORWARD = "results/5_report/{sample}/{sample}_summary_fastqc_F.txt",
-    REVERSE = "results/5_report/{sample}/{sample}_summary_fastqc_R.txt"
+    FORWARD = "results/{sample}/5_report/{sample}_summary_fastqc_F.txt",
+    REVERSE = "results/{sample}/5_report/{sample}_summary_fastqc_R.txt",
+    CONCATENATE =  "results/{sample}/5_report/{sample}_fastqc.txt",
 
   threads:
     int(config['short_sh_commands_threads'])
@@ -86,13 +87,16 @@ rule parse_fastqc_output:
     "  -F={input.fastqc_F} "
     "  -R={input.fastqc_R} "
     "  -o=results/5_report/{wildcards.sample} ;"
+    " /bin/cat results/5_report/{wildcards.sample}/{wildcards.sample}_summary_fastqc_F.txt "
+    "  results/5_report/{wildcards.sample}/{wildcards.sample}_summary_fastqc_R.txt "
+    "  > {output.CONCATENATE} ;"
 
 #-------------------------------------------------------------------------------
 
 rule concatenate_results:
   input:
-    fastqc_F=expand("results/5_report/{sample}/{sample}_summary_fastqc_F.txt", sample=samples),
-    fastqc_R=expand("results/5_report/{sample}/{sample}_summary_fastqc_R.txt", sample=samples)
+    fastqc_F=expand("results/{sample}/5_report/{sample}_summary_fastqc_F.txt", sample=samples),
+    fastqc_R=expand("results/{sample}/5_report/{sample}_summary_fastqc_R.txt", sample=samples)
 
   output:
     "results/5_report/fastqc_summary_all.txt"

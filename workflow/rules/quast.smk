@@ -6,7 +6,7 @@ rule quast:
     "results/1_spades_assembly/{sample}/quast/report.txt"
 
   log:
-    "results/1_spades_assembly/{sample}/quast/quast_{sample}.log"
+    "results/logs/{sample}/quast.log"
 
   params:
     quast = config['quast']['quast_version']
