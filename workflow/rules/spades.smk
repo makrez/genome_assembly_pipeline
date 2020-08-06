@@ -7,7 +7,7 @@ rule spades:
   output:
     "results/{sample}/1_spades_assembly/contigs.fasta"
 
-  log: "results/logs/{sample}/spades.log"
+  log: "results/{sample}/logs/spades.log"
 
   params:
     conda_profile = "/mnt/apps/centos7/Conda/miniconda3/etc/profile.d/conda.sh",
@@ -23,7 +23,8 @@ rule spades:
   shell:
     " set +u ;"
     " source {params.conda_profile} ;"
-    " conda activate spades_3.14.0 ;" //# TODO: software versions
+    " conda activate spades_3.14.0 ;" #// TODO: software versions
+    " spades.py --version >> reslts/{wildcards.sample}/report/software.txt ;"
     " srun spades.py "
     "  --isolate "
 	  "  --cov-cutoff 'auto' "
@@ -32,7 +33,7 @@ rule spades:
     "  -m {resources.mem_gb} "
     "  -1 {input.FORWARD} "
     "  -2 {input.REVERSE} "
-    "  -o results/1_spades_assembly/{wildcards.sample} 2> {log} ;"
+    "  -o results/{wildcards.sample}/1_spades_assembly 2> {log} ;"
 
 #-------------------------------------------------------------------------------
 rule cleanup:
@@ -64,7 +65,7 @@ rule parse_coverage:
     CONTIGS = expand("results/{sample}/1_spades_assembly/contigs_200.fasta", sample = samples)
 
   output:
-    COVSTATS = "results/5_report/contig_coverage.txt"
+    COVSTATS = "results/report/contig_coverage.txt"
 
   threads:
     int(config['short_sh_commands_threads'])

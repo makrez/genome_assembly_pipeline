@@ -6,11 +6,11 @@ rule busco:
     LINK = "results/{sample}/2_busco/busco/link.txt"
 
   log:
-    "results/logs/{sample}/busco/busco.log"
+    "results/{sample}/logs/busco.log"
 
   params:
     conda_profile = "/mnt/apps/centos7/Conda/miniconda3/etc/profile.d/conda.sh",
-    version = "results/5_report/conda_software_versions.txt"
+    version = "results/{sample}/report/software.txt"
 
   threads:
     int(config['busco']['busco_threads'])
@@ -27,7 +27,7 @@ rule busco:
     " srun busco -m genome "
     "  -i {input.SCAFFOLDS} "
     "  -o {wildcards.sample}_busco "
-    "  --out_path results/2_busco/{wildcards.sample}/busco/ "
+    "  --out_path results/{wildcards.sample}/2_busco/busco/ "
     "  -c {threads} "
     "  --auto-lineage-prok "
     "  --offline 2> {log} ;"
@@ -40,7 +40,7 @@ rule move_busco_files:
     LINK =  "results/{sample}/2_busco/busco/link.txt"
 
   output:
-    LINK = "results/5_report/busco_summary/{sample}_buscolink.log"
+    LINK = "results/report/busco_summary/{sample}_buscolink.log"
 
   threads:
     int(config['short_sh_commands_threads'])
@@ -50,8 +50,8 @@ rule move_busco_files:
     hours = int(config['short_sh_commands_hours'])
 
   run:
-    dest_dir = "results/5_report/busco_summary/"
-    for file in glob.glob(f'results/2_busco/{wildcards.sample}/busco/{wildcards.sample}_busco/*.txt'):
+    dest_dir = "results/report/busco_summary/"
+    for file in glob.glob(f'results/{wildcards.sample}/2_busco/busco/{wildcards.sample}_busco/*.txt'):
         print(file)
         shutil.copy(file, dest_dir)
     f = open(f'{output.LINK}', 'w')
@@ -62,12 +62,12 @@ rule move_busco_files:
 
 rule make_busco_plots:
   input:
-    LINKS = expand("results/5_report/busco_summary/{sample}_buscolink.log", sample = samples)
+    LINKS = expand("results/report/busco_summary/{sample}_buscolink.log", sample = samples)
 
   output:
-    FIGURE = "results/5_report/busco_summary/busco_figure.png"
+    FIGURE = "results/report/busco_summary/busco_figure.png"
 
-  log = "results/logs/busco_plot.log"
+  log: "results/logs/busco_plot.log"
 
   threads:
     int(config['short_sh_commands_threads'])
@@ -84,4 +84,32 @@ rule make_busco_plots:
     " source {params.conda_profile} ;"
     " conda activate busco4 ;"
     " srun python workflow/scripts/scripts_generate_plot.py "
-    "  -wd results/5_report/busco_summary 2> {log} ;"
+    "  -wd results/report/busco_summary 2> {log} ;"
+
+#-------------------------------------------------------------------------------
+
+rule make_busco_plots_per_sample:
+  input:
+    LINKS = "results/{sample}/2_busco/busco/link.txt",
+
+  output:
+    FIGURE = "results/{sample}/2_busco/busco/{sample}_busco/busco_figure.png"
+
+  log: "results/{sample}/logs/busco_plot.log"
+
+  threads:
+    int(config['short_sh_commands_threads'])
+
+  resources:
+    mem_mb = int(config['short_commands_mb']),
+    hours = int(config['short_sh_commands_hours'])
+
+  params:
+    conda_profile = "/mnt/apps/centos7/Conda/miniconda3/etc/profile.d/conda.sh"
+
+  shell:
+    " set +u ;"
+    " source {params.conda_profile} ;"
+    " conda activate busco4 ;"
+    " srun python workflow/scripts/scripts_generate_plot_per_sample.py "
+    "  -wd results/{wildcards.sample}/2_busco/busco/{wildcards.sample}_busco/ 2> {log} ;"

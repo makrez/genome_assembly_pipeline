@@ -7,11 +7,11 @@ rule prokka:
     GENOME = "results/{sample}/4_prokka/{sample}.fna"
 
   log:
-    "results/logs/{sample}/prokka.log"
+    "results/{sample}/logs/prokka.log"
 
   params:
     conda_profile = "/mnt/apps/centos7/Conda/miniconda3/etc/profile.d/conda.sh",
-    version = "results/5_report/conda_software_versions.txt"
+    version = "results/{sample}/report/software.txt"
 
   threads:
     int(config['prokka']['prokka_threads'])
@@ -21,8 +21,11 @@ rule prokka:
     hours = int(config['prokka']['prokka_hours'])
 
   shell:
-    " set +u ;"
+    " set +u ; "
     " source {params.conda_profile} ;"
+    " conda activate gtdbtk ;"
+    " gtdbtk --version >> {params.version} ;" # hack to get the gtdbtk version for each sample
+    " conda deactivate ;"
     " conda activate prokka_1.14.6 ;"
     " prokka --version >> {params.version} ;"
     " srun prokka "
@@ -61,7 +64,7 @@ rule concatenate_prokka:
     CSV = expand("results/{sample}/4_prokka/{sample}.csv", sample = samples)
 
   output:
-    "results/5_report/prokka_summary.csv"
+    "results/report/prokka_summary.csv"
 
   threads:
     int(config['short_sh_commands_threads'])
@@ -104,11 +107,10 @@ rule gtdb:
     LINK = "results/genomes/gtdb_link.txt",
     DIR = directory("results/taxonomy")
 
-  log: "results/logs/{sample}/gtdbk.log
+  log: "results/gtdbk.log"
 
   params:
     conda_profile = "/mnt/apps/centos7/Conda/miniconda3/etc/profile.d/conda.sh",
-    version = "results/5_report/conda_software_versions.txt"
 
   threads:
     int(config['gtdb']['gtdb_threads'])
@@ -121,7 +123,6 @@ rule gtdb:
     " set +u ;"
     " source {params.conda_profile} ;"
     " conda activate gtdbtk ;"
-    " gtdbtk --version >> {params.version} ;"
     " /bin/mkdir -p results/taxonomy ;"
     " srun gtdbtk classify_wf "
     "  --genome_dir results/genomes/ "

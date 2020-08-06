@@ -1,8 +1,11 @@
 {
-  "DataFolder" : "data_testing/",
+  "Project_Title": "Test Project",
+  "author": "Marco Kreuzer",
+  "email": "marco.kreuzer@bioinformatics.unibe.ch",
+  "institute": "Interfaculty Bioinformatics Unit, University of Bern",
+  "DataFolder" : "/data/datasets/E_coli_testdata/raw/p100/",
   "DataFolder_testing": "/data/datasets/E_coli_testdata/raw/p10/",
   "extension" : ".fastq.gz",
-  "complete_extension": "_.\\.fastq\\.gz",
   "mates" : {
     "mate1" : "_1",
     "mate2" : "_2"
@@ -21,8 +24,8 @@
   },
   "spades" : {
     "spades_hours": 72,
-    "spades_mem_mb": 20000,
-    "spades_mem_gb":20,
+    "spades_mem_mb": 200000,
+    "spades_mem_gb":200,
     "spades_threads": 64,
     "spades_min_scaffold_length": 200
   },

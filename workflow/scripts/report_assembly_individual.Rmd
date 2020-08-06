@@ -1,0 +1,191 @@
+---
+output:
+  html_document:
+    self_contained: true
+    toc: true # table of content true
+    toc_float: true
+    toc_depth: 2  # upto two depths of headings (specified by #, ## and ###)
+    theme: spacelab
+params:
+    title: ""
+    author: ""
+    email: ""
+    sample: ""
+    institute: ""
+    fastqc_table: ""
+    fastp_json: ""
+    quast_table: ""
+    quast_cov_hist: ""
+    quest_coverage_line: ""
+    quast_cumulative_plot: ""
+    quast_gc_content_plot: ""
+    busco_plot: ""
+    confindr_csv: ""
+    prokka_csv: ""
+    taxonomy: ""
+    software: ""
+
+title: "`r params$title`"
+author: "`r params$author`"
+date: "`r format(Sys.time(), '%d/%m/%Y')`"
+documentclass: article
+---
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(kableExtra)
+library(RJSONIO)
+options(scipen=999)
+# Source Functions for transforming data and styling outputs.
+source("report_utils.R", local = knitr::knit_global())
+```
+
+\tableofcontents
+
+# Assembly of Sample `r params$sample`
+
+**Contact:** `r params$email`
+
+**Institute:** `r params$institute`
+
+## Read Quality
+
+### Trimming statistics with fastp
+
+For quality and adapter trimming, the tool [fastp](https://github.com/OpenGene/fastp)
+was used. The summary statistics are shown in the tables below.
+
+<br>
+
+```{r, echo=FALSE, warning=FALSE}
+fastp_json <-  RJSONIO::fromJSON(params$fastp_json)
+fastp_result <- transform_fastp_result(fastp_json) #function in report_utils.R
+caption<-"Overall statistics of the read trimming step."
+table_styling(fastp_result, caption)
+```
+
+<br>
+
+```{r, echo=FALSE, warning=FALSE}
+fastp_comp <- transform_fastp_comparison(fastp_json) #function in report_utils.R
+caption<-"Read statistics before and after trimming."
+table_styling(fastp_comp, caption)
+```
+
+## FastQC
+
+[FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) was used to
+check the quality of the reads after filtering. The tool checks for example if
+platform specific adapter sequences were removed.
+
+```{r, echo=FALSE, warning=FALSE}
+fastqc <- read.table(params$fastqc_table, header = F)
+fastqc <- transform_fastqc(fastqc) #function in report_utils.R
+caption<-"Results from FastQC. Deduplicated refers to the percentage of reads
+remaining if optical duplicates are removed. Optical duplicates occur when the exact same fragment has been sequenced more than once."
+table_styling(fastqc, caption)
+```
+
+## Assembly Statistics with Qast
+
+The assembly is evaluated using [Quast](http://bioinf.spbau.ru/quast). The tool computes several statistics that help inferring if the assembly was successful.
+
+Particularly the following metrics are important:
+
+* **Largest Contig**: Length of the largest contig of the asembled contigs.
+
+* **N50**: To compute this metric, the contigs are first sorted by size. The sizes of the largest contigs are summed up until the sum of these is larger than half of the total size of the assembly. The N50 describes the length of the smallest contig that
+is needed to get the sum that is larger than half of the total assembly size.
+Example: Given an assembly with 5 contigs of length 9,6,5,4,3; then the total assembly size is 27 and the N50 cutoff is 13.5. Thus the N50 of this assembly would be 6,
+because 6 + 9 > 13.5.
+
+* **L50**: L50 is the number of contigs equal or larger than the N50 contig. In the example above, the L50 value is 2.
+
+See [here](http://quast.sourceforge.net/docs/manual.html) for further
+explanations of quast metrics.
+
+<br>
+
+```{r, echo=FALSE, warning=FALSE}
+quast_table <- read.csv(params$quast_table, header = T)
+quast_table <- quast_table
+caption<-"Some basic metrics evaluated by Quast. "
+table_styling(quast_table, caption)
+```
+
+<br>
+
+```{r image_grobs,  echo=FALSE, warning=FALSE, fig.show = "hold", out.width = "50%", fig.align = "default"}
+knitr::include_graphics(params$quast_cov_hist)
+
+knitr::include_graphics(params$quest_coverage_line)
+
+knitr::include_graphics(params$quast_cumulative_plot)
+
+knitr::include_graphics(params$quast_gc_content_plot)
+```
+
+## BUSCO
+
+From the (BUSCO)[https://busco.ezlab.org/busco_userguide.html] website:
+
+"BUSCO attempts to provide a quantitative assessment of the completeness in terms of expected gene content of a genome assembly, transcriptome, or annotated gene set. The results are simplified into categories of Complete and single-copy, Complete and duplicated, Fragmented, or Missing BUSCOs.
+
+BUSCO completeness results make sense only in the context of the biology of your organism. You have to understand whether missing or duplicated genes are of biological or technical origin. For instance, a high level of duplication may be explained by a recent whole duplication event (biological) or a chimeric assembly of haplotypes (technical). Transcriptomes and protein sets that are not filtered for isoforms will lead to a high proportion of duplicates. Therefore you should filter them before a BUSCO analysis. Finally, focusing on specific tissues or specific life stages and conditions in a transcriptomic experiment is unlikely to produce a BUSCO-complete transcriptome. In this case, consistency across your samples is what you will be aiming for."
+
+<br>
+
+```{r, echo=FALSE, warning=FALSE, fig.cap = "Genome assembly assessment using BUSCO4. The figure shows how many expected genes are complete, complete and duplicate, fragmented or missing."}
+knitr::include_graphics(params$busco_plot)
+```
+
+## confindr
+
+(confindr)[https://github.com/OLC-Bioinformatics/ConFindr] analyses genes that are known to be single-copy and conserved across all bacteria and evaluates whether there is more than one allele present in the tested genes. This may indicate intra-species contamination. The tool uses the raw reads for evaluating this and therefore, the results
+are given for forward and reverse reads independently.
+
+<br>
+
+```{r, echo=FALSE, warning=FALSE}
+confindr_csv <- read.csv(params$confindr_csv, header = T)
+confindr_csv <- transform_confindr_csv(confindr_csv)
+caption<-"confindr results."
+table_styling(confindr_csv, caption)
+```
+
+## Annotation using Prokka
+
+(Prokka)[https://github.com/tseemann/prokka] is used to annotate the assembly with
+useful features, such as CDS, genes, or rRNAs.
+
+<br>
+
+```{r, echo=FALSE, warning=FALSE}
+prokka_csv <- read.csv(params$prokka_csv, header = T)
+prokka_csv <- transform_prokka_csv(prokka_csv)
+caption<-"Summary statistics of the annotation with Prokka."
+table_styling(prokka_csv, caption)
+```
+
+## Taxonomy
+
+In order to obtain a taxonomic classification of the assembly, the tool (GTDBTK)[https://github.com/Ecogenomics/GTDBTk] compares the assembly with a
+reference database. The tool infers the taxonomy by computing the Average Nucleotide
+Identity (ANI) against the reference database and by placing the genome into a phylogenetic tree.
+
+<br>
+
+```{r, echo=FALSE, warning=FALSE}
+taxonomy <- read.table(params$taxonomy, sep = "\t", header = T)
+taxonomy <- transform_taxonomy(taxonomy, params$sample)
+caption<-"Taxonomic placement of the assembly. The classification method is either
+ANI/placement, placement or ANI. ANI/placement means that both methods agree on
+the taxonomic output. Otherwise the taxonomy of the better match is returned."
+table_styling(taxonomy, caption)
+```
+
+## Software Versions
+
+```{r comment='',echo=FALSE, warning=FALSE}
+cat(readLines(params$software), sep = '\n')
+```

@@ -20,8 +20,9 @@ case $i in
 esac
 done
 
-# unzip files#
+mkdir -p ${OUT}
 
+# unzip files
 echo "Out:" ${OUT}
 echo "Forward: " ${FORWARD}
 echo "Reverse: " ${REVERSE}

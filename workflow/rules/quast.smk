@@ -1,12 +1,12 @@
 rule quast:
   input:
-    "results/1_spades_assembly/{sample}/contigs_200.fasta"
+    "results/{sample}/1_spades_assembly/contigs_200.fasta"
 
   output:
-    "results/1_spades_assembly/{sample}/quast/report.txt"
+    "results/{sample}/1_spades_assembly/quast/report.txt"
 
   log:
-    "results/logs/{sample}/quast.log"
+    "results/{sample}/logs/quast.log"
 
   params:
     quast = config['quast']['quast_version']
@@ -19,19 +19,20 @@ rule quast:
     hours = int(config['quast']['quast_hours']),
 
   shell:
-    " module add UHTS/Quality_control/quast/4.6.0 ;"
+    " module add UHTS/Quality_control/quast/{params.quast} ;"
     " srun quast.py {input} "
-    "  -o  results/1_spades_assembly/{wildcards.sample}/quast/ "
+    "  -o  results/{wildcards.sample}/1_spades_assembly/quast/ "
     "  -m 200 &> {log} ;"
 
 #-------------------------------------------------------------------------------
 
 rule extract_quast_qual:
   input:
-    QUAST_report = "results/1_spades_assembly/{sample}/quast/report.txt"
+    QUAST_report = "results/{sample}/1_spades_assembly/quast/report.txt"
 
   output:
-    CSV = "results/5_report/{sample}/{sample}_quast.csv"
+    TMP1 = temp("results/{sample}/report/tmp1"),
+    TMP2 = temp("results/{sample}/report/tmp2"),
 
   threads:
     int(config['short_sh_commands_threads'])
@@ -41,20 +42,66 @@ rule extract_quast_qual:
     hours = int(config['short_sh_commands_hours'])
 
   shell:
-    " srun /bin/cat {input.QUAST_report} | "
-    "  grep -A 6 Largest | "
-    "  /bin/sed 's/ /_/' | "
-    "  /bin/awk -v var={wildcards.sample} -F ' ' '{{print $1','$2','var }}' | "
-    "  /bin/sed 's/ /,/g' | /bin/sed 's/_,/,/g'> {output.CSV} ;"
+    " /bin/cat {input.QUAST_report} | "
+    "  tail -n 22 | "
+    "  awk '{{print substr($0,0,28)}}' | sed 's/[ ]*$//' > {output.TMP1} ;"
+    " /bin/cat {input.QUAST_report} | "
+    "  tail -n 22 | "
+    "  awk '{{print substr($0,29,30)}}' | sed 's/[ ]*$//' > {output.TMP2} ;"
+
+rule create_CSV:
+  input:
+    TMP1 = "results/{sample}/report/tmp1",
+    TMP2 = "results/{sample}/report/tmp2",
+
+  output:
+    CSV = "results/{sample}/report/{sample}_quast.csv",
+
+  threads:
+    int(config['short_sh_commands_threads'])
+
+  resources:
+    mem_mb = int(config['short_commands_mb']),
+    hours = int(config['short_sh_commands_hours'])
+
+  shell:
+   " /bin/paste -d ',' {input.TMP1} {input.TMP2} > {output.CSV} ;"
+
+
+rule convert_pdf_png:
+    input:
+      TMP1 = "results/{sample}/report/tmp1",
+      TMP2 = "results/{sample}/report/tmp2",
+
+    output:
+      "results/{sample}/1_spades_assembly/quast/basic_stats/Nx_plot.png"
+
+    threads:
+      int(config['short_sh_commands_threads'])
+
+    resources:
+      mem_mb = int(config['short_commands_mb']),
+      hours = int(config['short_sh_commands_hours'])
+
+    params:
+      conda_profile = "/mnt/apps/centos7/Conda/miniconda3/etc/profile.d/conda.sh",
+      version = "results/report/conda_software_versions.txt",
+
+    shell:
+      " set +u ;"
+      " source {params.conda_profile} ;"
+      " conda activate imagemagick ;"
+      " mogrify -density 300 -format png "
+      "  results/{wildcards.sample}/1_spades_assembly/quast/basic_stats/*.* ;"
 
 #-------------------------------------------------------------------------------
 
 rule concatenate_qust:
   input:
-    CSV = expand("results/5_report/{sample}/{sample}_quast.csv", sample = samples)
+    CSV = expand("results/{sample}/report/{sample}_quast.csv", sample = samples)
 
   output:
-    "results/5_report/quast_summary.csv"
+    "results/report/quast_summary.csv"
 
   threads:
     int(config['short_sh_commands_threads'])

@@ -1,16 +1,21 @@
 rule finish_pipeline:
   input:
-    fastqc = "results/5_report/fastqc_summary_all.txt",
-    quast = "results/5_report/quast_summary.csv",
-    busco = "results/5_report/busco_summary/busco_figure.png",
-    confindr = "results/5_report/confindr_summary.csv",
-    gtdb = "results/4_prokka/genomes/gtdb_link.txt",
-    coverage="results/5_report/contig_coverage.txt",
-    prokka = "results/5_report/prokka_summary.csv",
-#    HTML = expand("results/5_report/{sample}_report.html", sample = samples)
+    fastqc = expand("results/{sample}/report/report_fastqc.txt", \
+                    sample = samples),
+    report = expand("results/{sample}/report/{sample}_report.html", \
+                    sample = samples)
+
+    # fastqc_all = "results/summary_report/fastqc_summary_all.txt"
+    # quast = "results/report/quast_summary.csv",
+    # busco = "results/report/busco_summary/busco_figure.png",
+    # confindr = "results/report/confindr_summary.csv",
+    # gtdb = "results/genomes/gtdb_link.txt",
+    # coverage="results/report/contig_coverage.txt",
+    # prokka = "results/report/prokka_summary.csv",
+#    HTML = expand("results/{sample}/report_report.html", sample = samples)
 
   output:
-    "results/logs/pipeline_finished.txt"
+    "results/{sample}/report/pipeline_finished.txt"
 
   threads:
     int(config['short_sh_commands_threads'])
@@ -20,9 +25,8 @@ rule finish_pipeline:
     hours = int(config['short_sh_commands_hours'])
 
   shell:
-    " grep version config/config.json | "
-    "  sed 's/\"//g' | sed 's/ //g' | sed 's/:/,/g'  "
-    "  > results/5_report/software.txt ;"
-    " sort results/5_report/conda_software_versions.txt | "
-    "  uniq >> results/5_report/software.txt ;"
-    " srun /bin/echo 'Pipeline finished' > {output} "
+    " /bin/echo 'Pipeline finished' > {output} ;"
+
+    #
+    # " #sort results/report/conda_software_versions.txt | "
+    # "  #uniq >> results/report/software.txt ;"

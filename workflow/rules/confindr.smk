@@ -6,11 +6,11 @@ rule confindr:
     CSV = "results/{sample}/3_confindr/confindr_report.csv"
 
   log:
-    "results/logs/{sample}/confindr.log"
+    "results/{sample}/logs/confindr.log"
 
   params:
     conda_profile = "/mnt/apps/centos7/Conda/miniconda3/etc/profile.d/conda.sh",
-    version = "results/5_report/conda_software_versions.txt"
+    version = "results/{sample}/report/software.txt"
 
   threads:
     int(config['confindr']['confindr_threads'])
@@ -25,8 +25,8 @@ rule confindr:
     " conda activate confindr ;"
     " confindr.py --version >> {params.version} ;"
     " srun confindr.py "
-    "  -i results/0_trim/{wildcards.sample}/ "
-    "  -o results/3_confindr/{wildcards.sample} "
+    "  -i results/{wildcards.sample}/0_trim/ "
+    "  -o results/{wildcards.sample}/3_confindr "
     "  -d /data/projects/p446_Dialact_Phoenix/7_sw_and_dbs/confindr_dbs "
     "  -t {threads} "
     "  --cross_details 2> {log};"
@@ -39,7 +39,7 @@ rule confindr_summary:
                  sample = samples)
 
   output:
-    CSV = "results/5_report/confindr_summary.csv"
+    CSV = "results/report/confindr_summary.csv"
 
   threads:
     int(config['short_sh_commands_threads'])
