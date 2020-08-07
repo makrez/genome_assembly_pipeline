@@ -271,7 +271,7 @@ div.tocify {
 <h2>Read Quality</h2>
 <div id="trimming-statistics-with-fastp" class="section level3">
 <h3>Trimming statistics with fastp</h3>
-<p>For quality and adapter trimming, the tool <a href="https://github.com/OpenGene/fastp">fastp</a> was used. The summary statistics are shown in the tables below.</p>
+<p>For quality and adapter trimming, the tool <a href="https://github.com/OpenGene/fastp">fastp</a> was used. Please refer to the per sample assembly reports for quality trimming statistics.</p>
 <p><br></p>
 </div>
 </div>
@@ -310,7 +310,7 @@ SRR3241868_1
 2'219'668
 </td>
    <td style="text-align:left;"> 
-72.9
+72.89
 </td>
    <td style="text-align:left;"> 
 <span style="     color: green !important;">pass</span>
@@ -426,38 +426,6 @@ N_per100kbp
 <tbody>
   <tr>
    <td style="text-align:left;"> 
-SRR3241868
-</td>
-   <td style="text-align:left;"> 
-340
-</td>
-   <td style="text-align:left;"> 
-249'175
-</td>
-   <td style="text-align:left;"> 
-5'444'596
-</td>
-   <td style="text-align:left;"> 
-50.39
-</td>
-   <td style="text-align:left;"> 
-95'506
-</td>
-   <td style="text-align:left;"> 
-42'722
-</td>
-   <td style="text-align:left;"> 
-20
-</td>
-   <td style="text-align:left;"> 
-41
-</td>
-   <td style="text-align:left;"> 
-0
-</td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> 
 SRR3241978
 </td>
    <td style="text-align:left;"> 
@@ -488,6 +456,38 @@ SRR3241978
 0
 </td>
   </tr>
+  <tr>
+   <td style="text-align:left;"> 
+SRR3241868
+</td>
+   <td style="text-align:left;"> 
+340
+</td>
+   <td style="text-align:left;"> 
+249'175
+</td>
+   <td style="text-align:left;"> 
+5'444'596
+</td>
+   <td style="text-align:left;"> 
+50.39
+</td>
+   <td style="text-align:left;"> 
+95'506
+</td>
+   <td style="text-align:left;"> 
+42'722
+</td>
+   <td style="text-align:left;"> 
+20
+</td>
+   <td style="text-align:left;"> 
+41
+</td>
+   <td style="text-align:left;"> 
+0
+</td>
+  </tr>
 </tbody>
 </table>
 
@@ -495,7 +495,7 @@ SRR3241978
 </div>
 <div id="busco" class="section level2">
 <h2>BUSCO</h2>
-<p>From the (BUSCO)[<a href="https://busco.ezlab.org/busco_userguide.html">https://busco.ezlab.org/busco_userguide.html</a>] website:</p>
+<p>From the <a href="https://busco.ezlab.org/busco_userguide.html">BUSCO</a> website:</p>
 <p>&quot;BUSCO attempts to provide a quantitative assessment of the completeness in terms of expected gene content of a genome assembly, transcriptome, or annotated gene set. The results are simplified into categories of Complete and single-copy, Complete and duplicated, Fragmented, or Missing BUSCOs.</p>
 <p>BUSCO completeness results make sense only in the context of the biology of your organism. You have to understand whether missing or duplicated genes are of biological or technical origin. For instance, a high level of duplication may be explained by a recent whole duplication event (biological) or a chimeric assembly of haplotypes (technical). Transcriptomes and protein sets that are not filtered for isoforms will lead to a high proportion of duplicates. Therefore you should filter them before a BUSCO analysis. Finally, focusing on specific tissues or specific life stages and conditions in a transcriptomic experiment is unlikely to produce a BUSCO-complete transcriptome. In this case, consistency across your samples is what you will be aiming for.&quot;</p>
 <p><br></p>
@@ -509,7 +509,7 @@ Genome assembly assessment using BUSCO4. The figure shows how many expected gene
 </div>
 <div id="confindr" class="section level2">
 <h2>confindr</h2>
-<p>(confindr)[<a href="https://github.com/OLC-Bioinformatics/ConFindr">https://github.com/OLC-Bioinformatics/ConFindr</a>] analyses genes that are known to be single-copy and conserved across all bacteria and evaluates whether there is more than one allele present in the tested genes. This may indicate intra-species contamination. The tool uses the raw reads for evaluating this and therefore, the results are given for forward and reverse reads independently.</p>
+<p><a href="https://github.com/OLC-Bioinformatics/ConFindr">confindr</a> analyses genes that are known to be single-copy and conserved across all bacteria and evaluates whether there is more than one allele present in the tested genes. This may indicate intra-species contamination. The tool uses the raw reads for evaluating this and therefore, the results are given for forward and reverse reads independently.</p>
 <p><br></p>
 <table class="table table-striped table-hover table-condensed table-responsive" style>
 <caption>
@@ -653,7 +653,7 @@ Escherichia
 </div>
 <div id="annotation-using-prokka" class="section level2">
 <h2>Annotation using Prokka</h2>
-<p>(Prokka)[<a href="https://github.com/tseemann/prokka">https://github.com/tseemann/prokka</a>] is used to annotate the assembly with useful features, such as CDS, genes, or rRNAs.</p>
+<p><a href="https://github.com/tseemann/prokka">Prokka</a> is used to annotate the assembly with useful features, such as CDS, genes, or rRNAs.</p>
 <p><br></p>
 <table class="table table-striped table-hover table-condensed table-responsive" style>
 <caption>
@@ -746,7 +746,7 @@ SRR3241868
 </div>
 <div id="taxonomy" class="section level2">
 <h2>Taxonomy</h2>
-<p>In order to obtain a taxonomic classification of the assembly, the tool (GTDBTK)[<a href="https://github.com/Ecogenomics/GTDBTk">https://github.com/Ecogenomics/GTDBTk</a>] compares the assembly with a reference database. The tool infers the taxonomy by computing the Average Nucleotide Identity (ANI) against the reference database and by placing the genome into a phylogenetic tree.</p>
+<p>In order to obtain a taxonomic classification of the assembly, the tool <a href="https://github.com/Ecogenomics/GTDBTk">GTDBTK</a> compares the assembly with a reference database. The tool infers the taxonomy by computing the Average Nucleotide Identity (ANI) against the reference database and by placing the genome into a phylogenetic tree.</p>
 <p><br></p>
 <table class="table table-striped table-hover table-condensed table-responsive" style>
 <caption>
@@ -847,13 +847,9 @@ ANI/Placement
 </div>
 <div id="software-versions" class="section level2">
 <h2>Software Versions</h2>
-<pre><code>BUSCO 4.0.6
-ConFindr 0.7.2
-fastp_version,0.19.5,
+<pre><code>fastp_version,0.19.5,
 fastqc_version,0.11.7,
-gtdbtk: version 0.3.2 Copyright 2017 Pierre Chaumeil
-quast_version,4.6.0,
-  SPAdes version: 3.14.0</code></pre>
+quast_version,4.6.0,</code></pre>
 </div>
 <div id="config" class="section level2">
 <h2>Config</h2>
