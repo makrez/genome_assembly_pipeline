@@ -41,7 +41,8 @@ rule convert_prokka_summary:
     TSV = "results/{sample}/4_prokka/{sample}.txt"
 
   output:
-    CSV = "results/{sample}/4_prokka/{sample}.csv"
+    CSV = "results/{sample}/4_prokka/{sample}.csv",
+    CSV_summary = "results/{sample}/4_prokka/{sample}_transformed.csv"
 
   threads:
     int(config['short_sh_commands_threads'])
@@ -56,15 +57,20 @@ rule convert_prokka_summary:
     "  /bin/sed 's/ /_/g' | /bin/sed 's/:_/ /g' | "
     "  /bin/awk -v var={wildcards.sample} '{{print $1\",\"$2\",\"var}}' "
     "  > {output.CSV} ;"
+    " srun /bin/sed 's/ *$//g' < {input.TSV} | "
+    "  /bin/sed 's/ /_/g' | /bin/sed 's/:_/ /g' | "
+    "  /bin/awk -v var={wildcards.sample} '{{print $1\",\"$2\",\"var}}' | "
+    "  tail -n+2 > {output.CSV_summary} ;"
 
 #-------------------------------------------------------------------------------
 
 rule concatenate_prokka:
   input:
-    CSV = expand("results/{sample}/4_prokka/{sample}.csv", sample = samples)
+    CSV = expand("results/{sample}/4_prokka/{sample}_transformed.csv",
+                 sample = samples)
 
   output:
-    "results/report/prokka_summary.csv"
+    "results/summary_report/prokka_summary.csv"
 
   threads:
     int(config['short_sh_commands_threads'])

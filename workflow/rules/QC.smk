@@ -24,7 +24,7 @@ rule fastp:
   shell:
     " module add UHTS/Quality_control/fastp/{params.fastp} ;"
     " mkdir -p results/{wildcards.sample}/report ;"
-    " /bin/touch results/report/conda_software_versions.txt ;"
+    " /bin/touch results/{wildcards.sample}/report/software.txt ;"
     " srun fastp "
     " -i {input.FORWARD} -o {output.FORWARD} "
     " -I {input.REVERSE} -O {output.REVERSE} "
@@ -108,7 +108,7 @@ rule concatenate_results:
     hours = int(config['short_sh_commands_hours'])
 
   shell:
-    " srun /bin/cat {input.fastqc_F} {input.fastqc_R}  > {output} ;"
+    " srun /bin/cat {input.CONCATENATE} > {output} ;"
       #"srun /bin/cat{input.fastqc_F} {input.fastqc_R} > {output}"
 
 #-------------------------------------------------------------------------------

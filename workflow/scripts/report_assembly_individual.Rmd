@@ -24,6 +24,7 @@ params:
     prokka_csv: ""
     taxonomy: ""
     software: ""
+    config: ""
 
 title: "`r params$title`"
 author: "`r params$author`"
@@ -127,7 +128,7 @@ knitr::include_graphics(params$quast_gc_content_plot)
 
 ## BUSCO
 
-From the (BUSCO)[https://busco.ezlab.org/busco_userguide.html] website:
+From the [BUSCO](https://busco.ezlab.org/busco_userguide.html) website:
 
 "BUSCO attempts to provide a quantitative assessment of the completeness in terms of expected gene content of a genome assembly, transcriptome, or annotated gene set. The results are simplified into categories of Complete and single-copy, Complete and duplicated, Fragmented, or Missing BUSCOs.
 
@@ -141,7 +142,7 @@ knitr::include_graphics(params$busco_plot)
 
 ## confindr
 
-(confindr)[https://github.com/OLC-Bioinformatics/ConFindr] analyses genes that are known to be single-copy and conserved across all bacteria and evaluates whether there is more than one allele present in the tested genes. This may indicate intra-species contamination. The tool uses the raw reads for evaluating this and therefore, the results
+[confindr](https://github.com/OLC-Bioinformatics/ConFindr) analyses genes that are known to be single-copy and conserved across all bacteria and evaluates whether there is more than one allele present in the tested genes. This may indicate intra-species contamination. The tool uses the raw reads for evaluating this and therefore, the results
 are given for forward and reverse reads independently.
 
 <br>
@@ -155,7 +156,7 @@ table_styling(confindr_csv, caption)
 
 ## Annotation using Prokka
 
-(Prokka)[https://github.com/tseemann/prokka] is used to annotate the assembly with
+[Prokka](https://github.com/tseemann/prokka)  is used to annotate the assembly with
 useful features, such as CDS, genes, or rRNAs.
 
 <br>
@@ -169,7 +170,7 @@ table_styling(prokka_csv, caption)
 
 ## Taxonomy
 
-In order to obtain a taxonomic classification of the assembly, the tool (GTDBTK)[https://github.com/Ecogenomics/GTDBTk] compares the assembly with a
+In order to obtain a taxonomic classification of the assembly, the tool [GTDBTK](https://github.com/Ecogenomics/GTDBTk) compares the assembly with a
 reference database. The tool infers the taxonomy by computing the Average Nucleotide
 Identity (ANI) against the reference database and by placing the genome into a phylogenetic tree.
 
@@ -188,4 +189,10 @@ table_styling(taxonomy, caption)
 
 ```{r comment='',echo=FALSE, warning=FALSE}
 cat(readLines(params$software), sep = '\n')
+```
+
+## Config
+
+```{r comment='',echo=FALSE, warning=FALSE}
+cat(readLines(params$config), sep = '\n')
 ```

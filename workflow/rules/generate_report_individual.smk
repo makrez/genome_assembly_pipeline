@@ -28,7 +28,7 @@ rule generate_report_individual:
     confindr_csv = "results/{sample}/3_confindr/confindr_report.csv",
     prokka_csv = "results/{sample}/4_prokka/{sample}.csv",
     gtdbk = "results/genomes/gtdb_link.txt",
-    quast_nxplot =      "results/{sample}/1_spades_assembly/quast/basic_stats/Nx_plot.png"
+    quast_nxplot = "results/{sample}/1_spades_assembly/quast/basic_stats/Nx_plot.png"
     #fastqc = expand("results/{sample}/report/{sample}_fastqc.txt", sample = samples),
     #fastqc_2 = "results/report/fastqc_summary_all.txt"
 
@@ -66,7 +66,8 @@ rule generate_report_individual:
     confindr_csv = "../../results/{sample}/3_confindr/confindr_report.csv",
     prokka_csv = "../../results/{sample}/4_prokka/{sample}.csv",
     taxonomy = "../../results/taxonomy/classify/gtdbtk.bac120.summary.tsv",
-    software = "../../results/{sample}/report/software.txt"
+    software = "../../results/{sample}/report/software.txt",
+    config = "../../config/config.json"
 
   shell:
     " srun xvfb-run -a {params.R_path}/Rscript -e \"rmarkdown::render('{input.RMD}', "
@@ -87,5 +88,6 @@ rule generate_report_individual:
     "                confindr_csv = '{params.confindr_csv}', "
     "                prokka_csv = '{params.prokka_csv}', "
     "                taxonomy = '{params.taxonomy}', "
-    "                software = '{params.software}' "
+    "                software = '{params.software}', "
+    "                config = '{params.config}' "
     ") ) \""

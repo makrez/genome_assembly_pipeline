@@ -39,7 +39,7 @@ rule confindr_summary:
                  sample = samples)
 
   output:
-    CSV = "results/report/confindr_summary.csv"
+    CSV = "results/summary_report/confindr_summary.csv"
 
   threads:
     int(config['short_sh_commands_threads'])

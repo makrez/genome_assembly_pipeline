@@ -15,7 +15,6 @@ table_styling <- function(table, caption){
   knitr::kable(table, format = "html", escape = F, caption = caption) %>%
     kableExtra::kable_styling(
       bootstrap_options = c("striped", "hover", "condensed", "responsive"),
-      #full_width = F,
       fixed_thead = T,
       position = "left"
   )
@@ -55,6 +54,17 @@ transform_fastqc <- function(fastqc_table){
   return(fastqc_table)
 }
 
+# Quast for summary report
+
+transform_quast_summary <- function(table){
+  names(table) <- c("Metric", "Value", "Sample")
+  table <- table %>%
+    pivot_wider(Sample, names_from = "Metric", values_from = "Value") %>%
+    select('Sample','# contigs', 'Largest contig', 'Total length', 'GC (%)',
+          'N50', 'N75', 'L50','L75','# N\'s per 100 kbp') %>%
+          rename(N_per100kbp = '# N\'s per 100 kbp')
+  return(table)
+}
 
 # Confindr
 #-------------------------------------------------------------------------------
@@ -67,7 +77,6 @@ transform_confindr_csv <- function(table){
     )
 }
 
-
 # Prokka csv
 #-------------------------------------------------------------------------------
 
@@ -77,6 +86,14 @@ transform_prokka_csv <- function(csv){
   return(csv)
 }
 
+transform_prokka_csv_summary <- function(csv){
+  names(csv) <- c("Feature", "Count", "Sample")
+  csv <- csv %>%
+      pivot_wider(Sample, names_from = "Feature", values_from = "Count")
+  return(csv)
+}
+
+
 # Taxonomy Table
 #-------------------------------------------------------------------------------
 
@@ -85,6 +102,14 @@ transform_taxonomy <- function(tax, sample){
   tax <- tax %>%
     filter(user_genome == !!sample)
 
+  tax <- tax %>% select(user_genome, classification, classification_method) %>%
+    rename(Sample = user_genome) %>%
+    separate(classification, sep =";.__",
+      into = c("Domain", "Phylum", "Class", "Order", "Family", "Genus", "Species"))
+  return(tax)
+}
+
+transform_taxonomy_summary <- function(tax){
   tax <- tax %>% select(user_genome, classification, classification_method) %>%
     rename(Sample = user_genome) %>%
     separate(classification, sep =";.__",

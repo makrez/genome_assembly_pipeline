@@ -50,7 +50,7 @@ grep -E 'Filename|Total Sequences|Adapter Content|Total Deduplicated' \
  sed 's/\.gz//g' > ${OUT}/${SAMPLE}_summary_fastqc_F.txt
 
 grep -E 'Filename|Total Sequences|Adapter Content|Total Deduplicated' \
- < ${OUT}/${BASENAME_FORWARD}/${BASENAME_FORWARD}/fastqc_data.txt | \
+ < ${OUT}/${BASENAME_REVERSE}/${BASENAME_REVERSE}/fastqc_data.txt | \
  awk '{print $NF}' | paste -sd '\t'| sed 's/.fastq//g' | \
  sed 's/RP//' | sed 's/$/   reverse/g' | \
  sed 's/\.gz//g' > ${OUT}/${SAMPLE}_summary_fastqc_R.txt

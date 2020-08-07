@@ -23,8 +23,8 @@ rule spades:
   shell:
     " set +u ;"
     " source {params.conda_profile} ;"
-    " conda activate spades_3.14.0 ;" #// TODO: software versions
-    " spades.py --version >> reslts/{wildcards.sample}/report/software.txt ;"
+    " conda activate spades_3.14.0 ;" #// TODO: software version will not add to report/software.txt; workaround see below.
+    " srun spades.py --version >> results/{wildcards.sample}/report/software.txt ;"
     " srun spades.py "
     "  --isolate "
 	  "  --cov-cutoff 'auto' "
@@ -33,7 +33,11 @@ rule spades:
     "  -m {resources.mem_gb} "
     "  -1 {input.FORWARD} "
     "  -2 {input.REVERSE} "
-    "  -o results/{wildcards.sample}/1_spades_assembly 2> {log} ;"
+    "  -o results/{wildcards.sample}/1_spades_assembly ;"
+    " grep 'SPAdes version' results/{wildcards.sample}/1_spades_assembly/spades.log " # Extract Version and append to software.txt
+    "  >> results/{wildcards.sample}/report/software.txt ;"
+    " cp results/{wildcards.sample}/1_spades_assembly/spades.log " # Copy log file to logs.
+    "  results/{wildcards.sample}/logs/spades.log ;"
 
 #-------------------------------------------------------------------------------
 rule cleanup:
@@ -62,10 +66,11 @@ rule cleanup:
 #-------------------------------------------------------------------------------
 rule parse_coverage:
   input:
-    CONTIGS = expand("results/{sample}/1_spades_assembly/contigs_200.fasta", sample = samples)
+    CONTIGS = expand("results/{sample}/1_spades_assembly/contigs_200.fasta",
+                     sample = samples)
 
   output:
-    COVSTATS = "results/report/contig_coverage.txt"
+    COVSTATS = "results/summary_report/contig_coverage.txt"
 
   threads:
     int(config['short_sh_commands_threads'])

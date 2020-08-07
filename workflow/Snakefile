@@ -25,10 +25,8 @@ mates = list(config['mates'].values())
 #------------------------------------------------------------------------------
 
 rule all:
-    input: #"results/5_report/pipeline_finished.txt"
- #     expand("results/5_report/{sample}_report.html", sample =samples),
-      expand("results/{sample}/report/pipeline_finished.txt", \
-             sample = samples)
+    input:
+      expand("results/{sample}/report/pipeline_finished.txt", sample = samples)
 
 include: "rules/QC.smk"
 include: "rules/spades.smk"
@@ -37,4 +35,5 @@ include: "rules/busco.smk"
 include: "rules/confindr.smk"
 include: "rules/prokka.smk"
 include: "rules/generate_report_individual.smk"
+include: "rules/generate_report.smk"
 include: "rules/finish.smk"

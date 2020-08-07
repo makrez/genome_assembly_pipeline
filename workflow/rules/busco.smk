@@ -5,9 +5,6 @@ rule busco:
   output:
     LINK = "results/{sample}/2_busco/busco/link.txt"
 
-  log:
-    "results/{sample}/logs/busco.log"
-
   params:
     conda_profile = "/mnt/apps/centos7/Conda/miniconda3/etc/profile.d/conda.sh",
     version = "results/{sample}/report/software.txt"
@@ -30,7 +27,9 @@ rule busco:
     "  --out_path results/{wildcards.sample}/2_busco/busco/ "
     "  -c {threads} "
     "  --auto-lineage-prok "
-    "  --offline 2> {log} ;"
+    "  --offline ;"
+    " cp results/{wildcards.sample}/2_busco/busco/{wildcards.sample}_busco/logs/busco.log "
+    "  results/{wildcards.sample}/logs/busco.log ;"
     " srun /bin/touch {output.LINK} ;"
 
 #-------------------------------------------------------------------------------
@@ -40,7 +39,7 @@ rule move_busco_files:
     LINK =  "results/{sample}/2_busco/busco/link.txt"
 
   output:
-    LINK = "results/report/busco_summary/{sample}_buscolink.log"
+    LINK = "results/summary_report/busco_summary/{sample}_buscolink.log"
 
   threads:
     int(config['short_sh_commands_threads'])
@@ -50,7 +49,7 @@ rule move_busco_files:
     hours = int(config['short_sh_commands_hours'])
 
   run:
-    dest_dir = "results/report/busco_summary/"
+    dest_dir = "results/summary_report/busco_summary/"
     for file in glob.glob(f'results/{wildcards.sample}/2_busco/busco/{wildcards.sample}_busco/*.txt'):
         print(file)
         shutil.copy(file, dest_dir)
@@ -62,10 +61,11 @@ rule move_busco_files:
 
 rule make_busco_plots:
   input:
-    LINKS = expand("results/report/busco_summary/{sample}_buscolink.log", sample = samples)
+    LINKS = expand("results/summary_report/busco_summary/{sample}_buscolink.log",
+                   sample = samples)
 
   output:
-    FIGURE = "results/report/busco_summary/busco_figure.png"
+    FIGURE = "results/summary_report/busco_summary/busco_figure.png"
 
   log: "results/logs/busco_plot.log"
 
@@ -84,7 +84,7 @@ rule make_busco_plots:
     " source {params.conda_profile} ;"
     " conda activate busco4 ;"
     " srun python workflow/scripts/scripts_generate_plot.py "
-    "  -wd results/report/busco_summary 2> {log} ;"
+    "  -wd results/summary_report/busco_summary 2> {log} ;"
 
 #-------------------------------------------------------------------------------
 

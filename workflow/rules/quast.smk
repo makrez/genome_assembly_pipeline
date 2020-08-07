@@ -95,13 +95,31 @@ rule convert_pdf_png:
       "  results/{wildcards.sample}/1_spades_assembly/quast/basic_stats/*.* ;"
 
 #-------------------------------------------------------------------------------
+rule transform_quast:
+  input:
+    CSV = "results/{sample}/report/{sample}_quast.csv"
+
+  output:
+    "results/{sample}/report/{sample}_quast_tranformed.csv"
+
+  threads:
+    int(config['short_sh_commands_threads'])
+
+  resources:
+    mem_mb = int(config['short_commands_mb']),
+    hours = int(config['short_sh_commands_hours'])
+
+  shell:
+    " /bin/awk -v var={wildcards.sample} 'NR>2 {{print $0\",\"var}}' {input.CSV} "
+    "  | tail -n+2 > {output} ;"
 
 rule concatenate_qust:
   input:
-    CSV = expand("results/{sample}/report/{sample}_quast.csv", sample = samples)
+    CSV = expand("results/{sample}/report/{sample}_quast_tranformed.csv",
+                 sample = samples)
 
   output:
-    "results/report/quast_summary.csv"
+    "results/summary_report/quast_summary.csv"
 
   threads:
     int(config['short_sh_commands_threads'])

@@ -1,0 +1,224 @@
+---
+output:
+  html_document:
+    self_contained: true
+    toc: true # table of content true
+    toc_float: true
+    toc_depth: 2  # upto two depths of headings (specified by #, ## and ###)
+    theme: spacelab
+params:
+    title: ""
+    author: ""
+    email: ""
+    institute: ""
+    fastqc_table: ""
+    fastp_json: ""
+    quast_table: ""
+    quast_cov_hist: ""
+    quest_coverage_line: ""
+    quast_cumulative_plot: ""
+    quast_gc_content_plot: ""
+    busco_plot: ""
+    confindr_csv: ""
+    prokka_csv: ""
+    taxonomy: ""
+    software: ""
+
+title: "`r params$title`"
+author: "`r params$author`"
+date: "`r format(Sys.time(), '%d/%m/%Y')`"
+documentclass: article
+---
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(kableExtra)
+library(RJSONIO)
+options(scipen=999)
+# Source Functions for transforming data and styling outputs.
+source("report_utils.R", local = knitr::knit_global())
+```
+
+\tableofcontents
+
+
+# Summary of Assemblies
+
+**Contact:** `r params$email`
+
+**Institute:** `r params$institute`
+
+## Read Quality
+
+### Trimming statistics with fastp
+
+For quality and adapter trimming, the tool [fastp](https://github.com/OpenGene/fastp)
+was used. The summary statistics are shown in the tables below.
+
+<br>
+
+## FastQC
+
+[FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) was used to
+check the quality of the reads after filtering. The tool checks for example if
+platform specific adapter sequences were removed.
+
+```{r, echo=FALSE, warning=FALSE}
+fastqc <- read.table(params$fastqc_table, header = F)
+fastqc <- transform_fastqc(fastqc) #function in report_utils.R
+caption<-"Results from FastQC. Deduplicated refers to the percentage of reads
+remaining if optical duplicates are removed. Optical duplicates occur when the exact same fragment has been sequenced more than once."
+table_styling(fastqc, caption)
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+# Readin data
+#------------------------------------------------------------------------------
+
+# Fastqc
+fastqc <- read.table("../../results/5_report/fastqc_summary_all.txt", header = F)
+names(fastqc) <- c("Sample", "Reads", "Deduplicated", "Adapter", "direction")
+fastqc <- fastqc %>% arrange(Sample)
+
+#confindr
+confindr <- read_csv("../../results/5_report/confindr_summary.csv")
+
+#quast
+quast <- read.csv("../../results/5_report/quast_summary.csv", header = FALSE)
+names(quast) <- c("Metric", "Value", "Sample")
+quast <- quast %>%
+  pivot_wider(Sample, names_from = "Metric", values_from = "Value")
+
+cov <- read.csv("../../results/5_report/contig_coverage.txt", header = TRUE)
+cov_table <- cov %>%
+  left_join(quast, by="Sample") %>%
+  mutate(large_contig = ifelse(length >=N50, 1,0)) %>%
+  filter(large_contig == 1) %>%
+  group_by(Sample) %>%
+  mutate(coverage_N50 = mean(coverage)) %>%
+  select(Sample, coverage_N50) %>%
+  distinct()
+
+quast <- quast %>%
+  left_join(cov_table, by = "Sample")
+
+#prokka
+prokka <- read.csv("../../results/5_report/prokka_summary.csv", header = FALSE)
+names(prokka) <- c("Category", "Value", "Sample")
+prokka <- prokka %>%
+  pivot_wider(Sample, names_from = "Category", values_from = "Value") %>%
+  select(-organism)
+
+#taxonomy
+tax <- read.table("../../results/4_prokka/taxonomy/gtdbtk.bac120.summary.tsv", sep = "\t", header = TRUE)
+tax <- tax %>% select(user_genome, classification, classification_method) %>%
+  rename(Sample = user_genome) %>%
+  separate(classification, sep =";.__", into = c("Domain", "Phylum", "Class", "Order", "Family", "Genus", "Species"))
+
+tax_ar <- read.table("../../results/4_prokka/taxonomy/gtdbtk.ar122.summary.tsv", sep = "\t", header = TRUE)
+tax_ar <- tax_ar %>% select(user_genome, classification, classification_method) %>%
+  rename(Sample = user_genome) %>%
+  separate(classification, sep =";.__", into = c("Domain", "Phylum", "Class", "Order", "Family", "Genus", "Species"))
+
+tax_all <- bind_rows(tax,tax_ar) %>%
+  mutate(Domain = str_remove(Domain, "d__"))
+
+# software versions
+
+software <- readLines("../../results/5_report/software.txt")
+```
+\tableofcontents
+
+# Read Quality
+
+## FastQC
+
+```{r, echo=FALSE, warning=FALSE}
+fastqc <- fastqc %>%
+  mutate(Adapter = cell_spec(Adapter, color = ifelse(Adapter == "pass", "#04541a", "red"))) %>%
+  mutate(Sample = str_remove(Sample, "_1")) %>%
+  arrange(Sample) %>%
+  select(-direction) %>%
+  group_by(Sample, Deduplicated, Adapter) %>%
+  summarise(Reads = sum(Reads))
+
+knitr::kable(fastqc, escape = F, booktabs = TRUE, longtable = TRUE, digits = 2, linesep = c(""),
+             caption = "\\label{tab:fastqc} Results from FastQC.") %>%
+   kable_styling(bootstrap_options = "basic", full_width = F, position = "center",
+                 latex_options = c("hold_position", "repeat_header"))
+
+```
+
+
+# Assembly Quality
+
+## Quast
+
+```{r, echo=FALSE, warning=FALSE}
+knitr::kable(quast %>% arrange(Sample), escape = T, booktabs = TRUE, longtable = TRUE, digits = 2, linesep = c(""),
+            caption = "\\label{tab:quast} Results from quast.") %>%
+   kable_styling(bootstrap_options = "striped", full_width = F, position = "center",latex_options = c("hold_position", "repeat_header"))
+```
+
+## confindr
+
+```{r, echo=FALSE, warning=FALSE}
+confindr <- confindr %>%
+  mutate(Sample = str_replace(Sample, "_", "\\\\_")) %>%
+  mutate(ContamStatus =
+           cell_spec(ContamStatus, color =
+                                    ifelse(ContamStatus == "FALSE",
+                                           "#04541a", "red"))) %>%
+  arrange(Sample)
+
+knitr::kable(confindr %>%
+               select(Sample, Genus, NumContamSNVs,  PercentContam, ContamStatus),
+            escape = F, booktabs = TRUE, longtable = TRUE, digits = 2, linesep = c("", "\\addlinespace"),
+            caption = "\\label{tab:confindr} Results from confindr. This tool analyses genes that are known to be single-copy and conserved accross all bacteria and flags assemblies, where there are more than one allele present in some genes.") %>%
+   kable_styling(bootstrap_options = "striped", full_width = F, position = "center",
+                 latex_options = c("hold_position", "repeat_header"))
+```
+
+## busco
+
+\begin{figure}[H]
+\includegraphics[width=1\columnwidth]{../../results/5_report/busco_summary/busco_figure.png}
+\centering
+\caption{Genome assembly assessment using BUSCO4. The figure shows how many expected Genes are complete, complete \& duplicate, fragmented or missing.}
+\label{fig:busco}
+\end{figure}
+
+# Annotation and Taxonomy
+
+## Prokka Annotation
+
+
+```{r, echo=FALSE, warning=FALSE}
+knitr::kable(prokka %>% arrange(Sample),
+             escape = T, booktabs = TRUE, longtable = TRUE, digits = 2, linesep = c(""),
+            caption = "\\label{tab:prokka} Annotation results from prokka analysis.") %>%
+   kable_styling(bootstrap_options = "striped", full_width = F, position = "center",
+                 latex_options = c("hold_position", "repeat_header"))
+```
+
+## Taxonomy
+
+\begin{landscape}
+
+```{r, echo=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::kable(tax_all %>% arrange(Sample),
+             escape = T, booktabs = TRUE, longtable = TRUE, digits = 2, linesep = c(""),
+            caption = "\\label{tab:taxonomy} Results from GTDB-TK. The column placement method indicates whther the taxonomic assignment was done by Average Nucleotide Identity (ANI), or by estimating the placement in a phylogenetic reference tree (placement). \"ANI/placement\" means that both methods agree on the taxonomic assignment.") %>%
+   kable_styling(font_size=8,bootstrap_options = "striped",  position = "center",
+                 latex_options = c("hold_position", "repeat_header"))
+```
+
+\end{landscape}
+
+# Software Versions
+
+```{r, echo=FALSE, warning=FALSE}
+print(software)
+```
