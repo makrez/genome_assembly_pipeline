@@ -16,7 +16,7 @@ params:
     fastp_json: ""
     quast_table: ""
     quast_cov_hist: ""
-    quest_coverage_line: ""
+    quast_nx_plot: ""
     quast_cumulative_plot: ""
     quast_gc_content_plot: ""
     busco_plot: ""
@@ -119,7 +119,7 @@ table_styling(quast_table, caption)
 ```{r image_grobs,  echo=FALSE, warning=FALSE, fig.show = "hold", out.width = "50%", fig.align = "default"}
 knitr::include_graphics(params$quast_cov_hist)
 
-knitr::include_graphics(params$quest_coverage_line)
+knitr::include_graphics(params$quast_nx_plot)
 
 knitr::include_graphics(params$quast_cumulative_plot)
 

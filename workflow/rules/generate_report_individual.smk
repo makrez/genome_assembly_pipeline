@@ -58,7 +58,7 @@ rule generate_report_individual:
     fastqc = '../../results/{sample}/report/report_fastqc.txt',
     fastp_json = '../../results/{sample}/0_trim/{sample}.json',
     quast_cov_hist = "../../results/{sample}/1_spades_assembly/quast/basic_stats/contigs_200_coverage_histogram.png",
-    quest_coverage_line = "../../results/{sample}/1_spades_assembly/quast/basic_stats/coverage_histogram.png",
+    quast_nx_plot = "../../results/{sample}/1_spades_assembly/quast/basic_stats/Nx_plot.png",
     quast_cumulative_plot = "../../results/{sample}/1_spades_assembly/quast/basic_stats/cumulative_plot.png",
     quast_gc_content_plot = "../../results/{sample}/1_spades_assembly/quast/basic_stats/GC_content_plot.png",
     busco_plot = "../../results/{sample}/2_busco/busco/{sample}_busco/busco_figure.png",
@@ -80,7 +80,7 @@ rule generate_report_individual:
     "                fastqc_table = '{params.fastqc}', "
     "                fastp_json = '{params.fastp_json}', "
     "                quast_cov_hist = '{params.quast_cov_hist}', "
-    "                quest_coverage_line = '{params.quest_coverage_line}', "
+    "                quast_nx_plot = '{params.quast_nx_plot}', "
     "                quast_cumulative_plot = '{params.quast_cumulative_plot}', "
     "                quast_gc_content_plot = '{params.quast_gc_content_plot}', "
     "                busco_plot = '{params.busco_plot}', "
