@@ -40,7 +40,7 @@ rule spades:
     "  results/{wildcards.sample}/logs/spades.log ;"
 
 #-------------------------------------------------------------------------------
-rule cleanup:
+rule filter_contigs:
   input:
     "results/{sample}/1_spades_assembly/scaffolds.fasta"
 
@@ -48,7 +48,8 @@ rule cleanup:
     "results/{sample}/1_spades_assembly/scaffolds_200.fasta"
 
   params:
-    scaffolds_filter = int(config['spades']['spades_min_scaffold_length'])
+    scaffolds_filter = int(config['spades']['spades_min_scaffold_length']),
+    conda_profile = "/mnt/apps/centos7/Conda/miniconda3/etc/profile.d/conda.sh",
 
   threads:
     int(config['short_sh_commands_threads'])
@@ -58,10 +59,13 @@ rule cleanup:
     hours = int(config['short_sh_commands_hours'])
 
   shell:
-    " srun workflow/scripts/cleanup.sh -i={input} "
-    "  -o={output} "
-    "  -m={params.scaffolds_filter} "
-    "  -s={wildcards.sample} ;"
+    " set +u ;"
+    " source {params.conda_profile} ;"
+    " conda activate biopython_genome_assembly_pipeline ;"
+    " srun python workflow/scripts/filter_contigs.py "
+    "  --input_fasta {input} "
+    "  --sample_name {wildcards.sample} "
+    "  --min_length {params.scaffolds_filter} > {output} ;"
 
 #-------------------------------------------------------------------------------
 rule parse_coverage:
