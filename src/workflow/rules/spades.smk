@@ -5,7 +5,7 @@ rule spades:
     LINK = "results/{sample}/0_trim/result_fastqc/{sample}" + config['mates']['mate1'] + "_fastqc.zip",
 
   output:
-    "results/{sample}/1_spades_assembly/contigs.fasta"
+    "results/{sample}/1_spades_assembly/scaffolds.fasta"
 
   log: "results/{sample}/logs/spades.log"
 
