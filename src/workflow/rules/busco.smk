@@ -1,6 +1,6 @@
 rule busco:
   input:
-    SCAFFOLDS = "results/{sample}/1_spades_assembly/contigs_200.fasta"
+    SCAFFOLDS = "results/{sample}/1_spades_assembly/scaffolds_200.fasta"
 
   output:
     LINK = "results/{sample}/2_busco/busco/link.txt"

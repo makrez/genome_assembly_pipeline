@@ -1,6 +1,6 @@
 rule quast:
   input:
-    "results/{sample}/1_spades_assembly/contigs_200.fasta"
+    "results/{sample}/1_spades_assembly/scaffolds_200.fasta"
 
   output:
     "results/{sample}/1_spades_assembly/quast/report.txt"

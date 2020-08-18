@@ -42,10 +42,10 @@ rule spades:
 #-------------------------------------------------------------------------------
 rule cleanup:
   input:
-    "results/{sample}/1_spades_assembly/contigs.fasta"
+    "results/{sample}/1_spades_assembly/scaffolds.fasta"
 
   output:
-    "results/{sample}/1_spades_assembly/contigs_200.fasta"
+    "results/{sample}/1_spades_assembly/scaffolds_200.fasta"
 
   params:
     scaffolds_filter = int(config['spades']['spades_min_scaffold_length'])
@@ -66,7 +66,7 @@ rule cleanup:
 #-------------------------------------------------------------------------------
 rule parse_coverage:
   input:
-    CONTIGS = expand("results/{sample}/1_spades_assembly/contigs_200.fasta",
+    CONTIGS = expand("results/{sample}/1_spades_assembly/scaffolds_200.fasta",
                      sample = samples)
 
   output:

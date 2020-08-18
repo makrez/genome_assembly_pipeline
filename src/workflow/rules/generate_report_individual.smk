@@ -57,7 +57,7 @@ rule generate_report_individual:
     institute = config['institute'],
     fastqc = '../../results/{sample}/report/report_fastqc.txt',
     fastp_json = '../../results/{sample}/0_trim/{sample}.json',
-    quast_cov_hist = "../../results/{sample}/1_spades_assembly/quast/basic_stats/contigs_200_coverage_histogram.png",
+    quast_cov_hist = "../../results/{sample}/1_spades_assembly/quast/basic_stats/scaffolds_200_coverage_histogram.png",
     quast_nx_plot = "../../results/{sample}/1_spades_assembly/quast/basic_stats/Nx_plot.png",
     quast_cumulative_plot = "../../results/{sample}/1_spades_assembly/quast/basic_stats/cumulative_plot.png",
     quast_gc_content_plot = "../../results/{sample}/1_spades_assembly/quast/basic_stats/GC_content_plot.png",

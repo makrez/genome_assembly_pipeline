@@ -1,6 +1,6 @@
 rule prokka:
   input:
-    CONTIGS = "results/{sample}/1_spades_assembly/contigs_200.fasta"
+    CONTIGS = "results/{sample}/1_spades_assembly/scaffolds_200.fasta"
 
   output:
     TXT = "results/{sample}/4_prokka/{sample}.txt",
