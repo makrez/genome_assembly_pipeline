@@ -4,8 +4,8 @@ rule fastp:
     REVERSE = f"{DataFolder}" + "{sample}" + config['mates']['mate2'] + f"{fastx_extension}"
 
   output:
-    FORWARD = "results/{sample}/0_trim/{sample}" + "_1" + f"{fastx_extension}",
-    REVERSE = "results/{sample}/0_trim/{sample}" + "_2" + f"{fastx_extension}",
+    FORWARD = temp("results/{sample}/0_trim/{sample}" + "_1" + f"{fastx_extension}"),
+    REVERSE = temp("results/{sample}/0_trim/{sample}" + "_2" + f"{fastx_extension}"),
     JSON = "results/{sample}/0_trim/{sample}.json",
     HTML = "results/{sample}/0_trim/{sample}.html"
 
