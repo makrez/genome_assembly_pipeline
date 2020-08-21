@@ -103,7 +103,7 @@ because 6 + 9 > 13.5.
 * **L50**: L50 is the number of contigs equal or larger than the N50 contig. In the example above, the L50 value is 2.
 
 See [here](http://quast.sourceforge.net/docs/manual.html) for further
-explanations of quast metrics.
+explanations of quast metrics and plot descriptions.
 
 <br>
 
