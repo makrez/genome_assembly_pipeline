@@ -1,6 +1,6 @@
 rule confindr:
   input:
-    LINK = "results/{sample}/1_spades_assembly/scaffolds_200.fasta",
+    LINK = "results/{sample}/0_trim/{sample}" + "_2" + f"{fastx_extension}"
 
   output:
     CSV = "results/{sample}/3_confindr/confindr_report.csv"
