@@ -28,7 +28,7 @@ rule fastp:
     " srun fastp "
     " -i {input.FORWARD} -o {output.FORWARD} "
     " -I {input.REVERSE} -O {output.REVERSE} "
-    " -j {output.JSON} -h {output.HTML} "
+    " -r -j {output.JSON} -h {output.HTML} "
     " --detect_adapter_for_pe 2> {log} ;"
 
 #-------------------------------------------------------------------------------
