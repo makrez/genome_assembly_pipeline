@@ -12,6 +12,7 @@ rule fastp:
   log: "results/{sample}/logs/fastp.log"
 
   params:
+    conda_profile = "/mnt/apps/centos7/Conda/miniconda3/etc/profile.d/conda.sh",    
     fastp=config['fastp']['fastp_version']
 
   threads:
@@ -22,7 +23,9 @@ rule fastp:
     hours = int(config['fastp']['fastp_hours'])
 
   shell:
-    " module add UHTS/Quality_control/fastp/{params.fastp} ;"
+    " set +u ;"
+    " source {params.conda_profile} ;"
+    " conda activate seqtk_1.3 ; "
     " mkdir -p results/{wildcards.sample}/report ;"
     " /bin/touch results/{wildcards.sample}/report/software.txt ;"
     " srun fastp "

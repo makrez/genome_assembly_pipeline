@@ -1,9 +1,9 @@
 {
   "Project_Title": "Test Project",
   "author": "Marco Kreuzer",
-  "email": "marco.kreuzer@bioinformatics.unibe.ch",
+  "email": "simone.oberhaensli@bioinformatics.unibe.ch",
   "institute": "Interfaculty Bioinformatics Unit, University of Bern",
-  "DataFolder" : "/data/datasets/E_coli_testdata/raw/p100/",
+  "DataFolder" : "/data/projects/p446_Dialact_Phoenix/2_analyses/A_illumina/202006/test_pipeline/raw_data/",
   "DataFolder_testing": "/data/datasets/E_coli_testdata/raw/p10/",
   "extension" : ".fastq.gz",
   "mates" : {
@@ -11,7 +11,7 @@
     "mate2" : "_2"
     },
   "fastp" : {
-    "fastp_version" : "0.19.5",
+    "fastp_version" : "0.20.1",
     "fastp_threads" : 10,
     "fastp_hours": 4,
     "fastp_mem_mb": 5000
