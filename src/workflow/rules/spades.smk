@@ -27,7 +27,7 @@ rule spades:
     " srun spades.py --version >> results/{wildcards.sample}/report/software.txt ;"
     " srun spades.py "
     "  --isolate "
-	  "  --cov-cutoff 'auto' "
+    "  --cov-cutoff 'auto' "
     "  -t {threads} "
     "  -k 21,33,55,77,99,127 "
     "  -m {resources.mem_gb} "

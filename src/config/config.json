@@ -3,8 +3,8 @@
   "author": "Marco Kreuzer",
   "email": "simone.oberhaensli@bioinformatics.unibe.ch",
   "institute": "Interfaculty Bioinformatics Unit, University of Bern",
-  "DataFolder" : "/data/projects/p446_Dialact_Phoenix/2_analyses/A_illumina/202006/test_pipeline/raw_data/",
-  "DataFolder_testing": "/data/datasets/E_coli_testdata/raw/p10/",
+  "DataFolder" : "/data/projects/p548_pipelines_Marco_Kreuzer/genome_assembly_pipeline/src/data_testing/",
+  "DataFolder_testing": "/data/datasets/E_coli_testdata/genome_assembly_test/",
   "extension" : ".fastq.gz",
   "mates" : {
     "mate1" : "_1",

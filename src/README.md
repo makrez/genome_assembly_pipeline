@@ -70,7 +70,7 @@ the file "results/5_report/conda_software_versions.txt"
 
 * short_sh_commands_hours: Number of hours used for short bash commands.
 
-*make sure to allocate enough memory to SPADes (>250GB) and GTDB-TK (>20GB)* 
+*make sure to allocate enough memory to SPADes (>250GB) and GTDB-TK (>20GB)*
 
 
 **Data specifications**
@@ -97,16 +97,18 @@ the same logic is reproduced but the data folder and the configuration about
 threads, memory and running time are changed.
 
 The data folder used for the testing the pipeline has to be specified in the
-`config.json` file `DataFoler_testing: /path/to/files/`
+`config.json` file `DataFoler_testing: /path/to/files/`.
+
+The pipeline has been tested with the data:
 
 ```
-chmod +x sync_test.sh # requires rsync
-./sync_test.sh
+/data/datasets/E_coli_testdata/genome_assembly_test/
 ```
-
 This test can be run on the IBU cluster with the command:
 
 ```
+chmod +x sync_test.sh
+./sync_test.sh  # requires rsync
 cd test;
 module load Utils/snakemake
 /opt/cluster/software/Conda/miniconda/3/bin/snakemake --printshellcmds --drmaa " --partition=pall --ntasks=1 --mem={resources.mem_mb} --cpus-per-task={threads} --time={resources.hours}:0 --mail-type=END,FAIL " --latency-wait 300 --jobs 4 --jobname <jobname>_{jobid}
@@ -115,7 +117,6 @@ module load Utils/snakemake
 Note that the test will not run on pshort, since rule gtdb uses a lot of memory.
 
 If this test finishes successfully, the whole script can be run with the actual data.
-
 
 ## Summary Report
 

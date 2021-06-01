@@ -69,30 +69,30 @@ rule create_CSV:
 
 
 rule convert_pdf_png:
-    input:
-      TMP1 = "results/{sample}/report/tmp1",
-      TMP2 = "results/{sample}/report/tmp2",
+  input:
+    TMP1 = "results/{sample}/report/tmp1",
+    TMP2 = "results/{sample}/report/tmp2",
 
-    output:
-      "results/{sample}/1_spades_assembly/quast/basic_stats/Nx_plot.png"
+  output:
+    "results/{sample}/1_spades_assembly/quast/basic_stats/Nx_plot.png"
 
-    threads:
-      int(config['short_sh_commands_threads'])
+  threads:
+    int(config['short_sh_commands_threads'])
 
-    resources:
-      mem_mb = int(config['short_commands_mb']),
-      hours = int(config['short_sh_commands_hours'])
+  resources:
+    mem_mb = int(config['short_commands_mb']),
+    hours = int(config['short_sh_commands_hours'])
 
-    params:
-      conda_profile = "/mnt/apps/centos7/Conda/miniconda3/etc/profile.d/conda.sh",
-      version = "results/report/conda_software_versions.txt",
+  params:
+    conda_profile = "/mnt/apps/centos7/Conda/miniconda3/etc/profile.d/conda.sh",
+    version = "results/report/conda_software_versions.txt",
 
-    shell:
-      " set +u ;"
-      " source {params.conda_profile} ;"
-      " conda activate imagemagick ;"
-      " mogrify -density 300 -format png "
-      "  results/{wildcards.sample}/1_spades_assembly/quast/basic_stats/*.* ;"
+  shell:
+    " set +u ;"
+    " source {params.conda_profile} ;"
+    " conda activate imagemagick ;"
+    " mogrify -density 300 -format png "
+    "  results/{wildcards.sample}/1_spades_assembly/quast/basic_stats/*.* ;"
 
 #-------------------------------------------------------------------------------
 rule transform_quast:

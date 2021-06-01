@@ -1,19 +1,19 @@
 rule get_softare_for_summary_report:
-    input:
-      expand("results/{sample}/report/software.txt", sample =samples)
+  input:
+    expand("results/{sample}/report/software.txt", sample =samples)
 
-    output:
-      "results/summary_report/software.txt"
+  output:
+    "results/summary_report/software.txt"
 
-    threads:
-      int(config['short_sh_commands_threads'])
+  threads:
+    int(config['short_sh_commands_threads'])
 
-    resources:
-      mem_mb = int(config['short_commands_mb']),
-      hours = int(config['short_sh_commands_hours'])
+  resources:
+    mem_mb = int(config['short_commands_mb']),
+    hours = int(config['short_sh_commands_hours'])
 
-    shell:
-      " /bin/cat {input} | sort | uniq > {output} ;"
+  shell:
+    " /bin/cat {input} | sort | uniq > {output} ;"
 
 rule generate_report:
   input:

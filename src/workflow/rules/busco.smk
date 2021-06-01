@@ -25,12 +25,14 @@ rule busco:
     "  -i {input.SCAFFOLDS} "
     "  -o {wildcards.sample}_busco "
     "  --out_path results/{wildcards.sample}/2_busco/busco/ "
+    "  --download_path /data/databases/busco5/busco_database "
     "  -c {threads} "
     "  --auto-lineage-prok "
     "  --offline ;"
     " cp results/{wildcards.sample}/2_busco/busco/{wildcards.sample}_busco/logs/busco.log "
     "  results/{wildcards.sample}/logs/busco.log ;"
     " srun /bin/touch {output.LINK} ;"
+    " srun /bin/rm -rf /tmp/sepp ;"
 
 #-------------------------------------------------------------------------------
 
